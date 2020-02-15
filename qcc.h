@@ -28,6 +28,19 @@ struct Token {
         int len;         // トークンの長さ
 };
 
+/*! \struct qcc_t
+ *  \brief Brief struct description
+ *
+ *  変数を格納する連結リスト
+ */
+typedef struct _LVar LVar;
+struct _LVar {
+        LVar *next;
+        char *name;
+        int len;
+        int offset;
+};
+
 /*! \enum NodeKind
  *
  *  抽象構文木のノードの種類
@@ -66,6 +79,7 @@ struct Node {
 extern Token *token;
 extern char *user_input;
 extern Node *code[100];
+extern LVar *locals;
 
 void program();
 Node *stmt();
