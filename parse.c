@@ -75,6 +75,11 @@ Token *tokenize(char *p)
                         continue;
                 }
 
+                if (*p == ';') {
+                        cur = new_token(TK_RESERVED, cur, p++, 1);
+                        continue;
+                }
+
                 if (isdigit(*p)) {
                         cur = new_token(TK_NUM, cur, p, 0);
                         char *q = p;
@@ -95,6 +100,46 @@ Token *tokenize(char *p)
         return head.next;
 }
 
+bool consume(char *op)
+{
+        if (token->kind != TK_RESERVED ||
+            strlen(op) != token->len ||
+            memcmp(token->str, op, token->len)) {
+                return false;
+        }
+        token = token->next;
+        return true;
+}
+
+Token *consume_ident()
+{
+        Token *tok;
+        if (token->kind == TK_IDENT) {
+                token = token->next;
+        }
+        return tok;
+}
+
+void expect(char *op)
+{
+        if (token->kind != TK_RESERVED ||
+            strlen(op) != token->len ||
+            memcmp(token->str, op, token->len)) {
+                error_at(token->str, "'%c'ではありません", op);
+        }
+        token = token->next;
+}
+
+int expect_number()
+{
+        if (token->kind != TK_NUM) {
+                error_at(token->str, "数ではありません");
+        }
+        int val = token->val;
+        token = token->next;
+        return val;
+}
+
 // Abstract Syntax Tree
 /* Syntax
  *
@@ -111,10 +156,9 @@ Token *tokenize(char *p)
  *
  */
 
-Node *code[100];
 
 void program() {
-        int i = 1;
+        int i = 0;
         while (!at_eof()) {
                 code[i++] = stmt();
         }
@@ -128,6 +172,11 @@ Node *stmt()
         return node;
 }
 
+Node *expr()
+{
+        return assign();
+}
+
 Node *assign()
 {
         Node *node = equality();
@@ -135,11 +184,6 @@ Node *assign()
                 node = new_binary(ND_ASSIGN, node, assign());
         }
         return node;
-}
-
-Node *expr()
-{
-        return equality();
 }
 
 Node *equality()
@@ -204,12 +248,24 @@ Node *unary()
 
 Node *primary()
 {
+        // ( expr ) に対応する処理
         if (consume("(")) {
                 Node *node = expr();
                 expect(")");
                 return node;
         }
 
+        // ident に対応する処理
+        if (token->kind == TK_IDENT) {
+                Node *node = calloc(1, sizeof(Node));
+                node->kind = ND_LVAR;
+                // 変数aはRBP-8, RBP-16 のように固定位置にある
+                node->offset = (token->str[0] - 'a' + 1) * 8;
+                token = token->next;
+                return node;
+        }
+
+        // num に対応する処理
         return new_node_num(expect_number());
 
 }
@@ -247,33 +303,3 @@ Node *new_node_num(int val)
         return node;
 }
 
-bool consume(char *op)
-{
-        if (token->kind != TK_RESERVED ||
-            strlen(op) != token->len ||
-            memcmp(token->str, op, token->len)) {
-                return false;
-        }
-        token = token->next;
-        return true;
-}
-
-void expect(char *op)
-{
-        if (token->kind != TK_RESERVED ||
-            strlen(op) != token->len ||
-            memcmp(token->str, op, token->len)) {
-                error_at(token->str, "'%c'ではありません", op);
-        }
-        token = token->next;
-}
-
-int expect_number()
-{
-        if (token->kind != TK_NUM) {
-                error_at(token->str, "数ではありません");
-        }
-        int val = token->val;
-        token = token->next;
-        return val;
-}

@@ -8,8 +8,8 @@
 typedef enum {
         TK_RESERVED,
         TK_NUM,
-        TK_EOF,
         TK_IDENT,
+        TK_EOF,
 } TokenKind;
 
 typedef struct Token Token;
@@ -65,6 +65,7 @@ struct Node {
 
 extern Token *token;
 extern char *user_input;
+extern Node *code[100];
 
 void program();
 Node *stmt();
@@ -80,6 +81,7 @@ Node *new_binary(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_node_num(int val);
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 bool consume(char *op);
+Token *consume_ident();
 void expect(char *op);
 int expect_number();
 
