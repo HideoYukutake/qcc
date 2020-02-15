@@ -69,6 +69,12 @@ Token *tokenize(char *p)
                         p += 2;
                         continue;
                 }
+
+                if (startswith(p, "=")) {
+                        cur = new_token(TK_RESERVED, cur, p++, 1);
+                        continue;
+                }
+
                 // Single-letter punctuator
                 if (strchr("+-*/()><", *p)) {
                         cur = new_token(TK_RESERVED, cur, p++, 1);
