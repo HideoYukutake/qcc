@@ -5,8 +5,6 @@
 #include <string.h>
 #include "qcc.h"
 
-const char regex[] = "[a-zA-Z_]+";
-
 // Utility
 void error_at(char *loc, char *fmt, ...)
 {
@@ -96,9 +94,12 @@ Token *tokenize(char *p)
                         continue;
                 }
 
-                // TODO 複数文字の文字列を受け付けるように変更する
                 if ('a' <= *p && *p <= 'z') {
-                        cur = new_token(TK_IDENT, cur, p++, 1);
+                        char *q = p;
+                        while ('a' <= *p && *p <= 'z') {
+                                p++;
+                        }
+                        cur = new_token(TK_IDENT, cur, q, p-q);
                         continue;
                 }
 
