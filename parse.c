@@ -5,6 +5,8 @@
 #include <string.h>
 #include "qcc.h"
 
+LVar *locals;
+
 // Utility
 void error_at(char *loc, char *fmt, ...)
 {
@@ -125,9 +127,11 @@ Token *consume_ident()
 {
         Token *tok;
         if (token->kind == TK_IDENT) {
+                tok = token;
                 token = token->next;
+                return tok;
         }
-        return tok;
+        return NULL;
 }
 
 void expect(char *op)
@@ -150,6 +154,18 @@ int expect_number()
         return val;
 }
 
+LVar *find_lvar(Token *tok)
+{
+        LVar *var;
+        for (var = locals; var; var = var->next) {
+                if (var->len == tok->len &&
+                    !memcmp(tok->str, var->name, var->len)) {
+                        return var;
+                }
+        }
+        return NULL;
+}
+
 // Abstract Syntax Tree
 /* Syntax
  *
@@ -169,6 +185,12 @@ int expect_number()
 
 void program() {
         int i = 0;
+        locals = calloc(1, sizeof(LVar));
+        locals->len = 0;
+        locals->name = "";
+        locals->offset = 0;
+        locals->next = NULL;
+
         while (!at_eof()) {
                 code[i++] = stmt();
         }
@@ -266,12 +288,24 @@ Node *primary()
         }
 
         // ident に対応する処理
-        if (token->kind == TK_IDENT) {
+        Token *tok = consume_ident();
+        if (tok) {
                 Node *node = calloc(1, sizeof(Node));
                 node->kind = ND_LVAR;
-                // 変数aはRBP-8, RBP-16 のように固定位置にある
-                node->offset = (token->str[0] - 'a' + 1) * 8;
-                token = token->next;
+
+                LVar *lvar = find_lvar(tok);
+
+                if (lvar) {
+                        node->offset = lvar->offset;
+                } else {
+                        lvar = calloc(1, sizeof(LVar));
+                        lvar->next = locals;
+                        lvar->name = tok->str;
+                        lvar->len = tok->len;
+                        lvar->offset = locals->offset + 8;
+                        node->offset = lvar->offset;
+                        locals = lvar;
+                }
                 return node;
         }
 

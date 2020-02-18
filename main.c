@@ -9,7 +9,6 @@
 Token *token;
 char *user_input;
 Node *code[100];
-LVar *locals;
 
 int main(int argc, char **argv)
 {
