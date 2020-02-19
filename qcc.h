@@ -9,6 +9,7 @@ typedef enum {
         TK_RESERVED,
         TK_NUM,
         TK_IDENT,
+        TK_RETURN,
         TK_EOF,
 } TokenKind;
 
