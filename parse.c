@@ -152,6 +152,17 @@ Token *consume_ident()
         return NULL;
 }
 
+Token *consume_return()
+{
+        Token *tok;
+        if (token->kind == TK_RETURN) {
+                tok = token;
+                token = token->next;
+                return tok;
+        }
+        return NULL;
+}
+
 void expect(char *op)
 {
         if (token->kind != TK_RESERVED ||
@@ -218,8 +229,19 @@ void program() {
 
 Node *stmt()
 {
-        Node *node = expr();
-        expect(";");
+        Node *node;
+        Token *tok = consume_return();
+        if (tok) {
+                node = calloc(1, sizeof(Node));
+                node->kind = ND_RETURN;
+                node->lhs = expr();
+        } else {
+                node = expr();
+        }
+
+        if (!consume(";")) {
+                error_at(token->str, "';'ではないトークンです。");
+        }
         return node;
 }
 
