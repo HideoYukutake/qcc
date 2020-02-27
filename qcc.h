@@ -6,10 +6,14 @@
  *  トークンの種類
  */
 typedef enum {
-        TK_RESERVED,
+        TK_RESERVED,  // return, if, else, while, for,
         TK_NUM,
-        TK_IDENT,
+        TK_IDENT,     // 識別子（変数など）
         TK_RETURN,
+        TK_IF,
+        TK_ELSE,
+        TK_WHILE,
+        TK_FOR,
         TK_EOF,
 } TokenKind;
 
@@ -60,6 +64,10 @@ typedef enum
         ND_LVAR,
         ND_NUM,
         ND_RETURN,
+        ND_IF,
+        ND_ELSE,
+        ND_WHILE,
+        ND_FOR,
 } NodeKind;
 
 typedef struct Node Node;
