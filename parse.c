@@ -187,6 +187,21 @@ Token *consume_return()
         return NULL;
 }
 
+Token *consume_reserved()
+{
+        Token *tok;
+        if (token->kind == TK_RETURN ||
+            token->kind == TK_IF ||
+            token->kind == TK_ELSE ||
+            token->kind == TK_FOR ||
+            token->kind == TK_WHILE) {
+                tok = token;
+                token = token->next;
+                return tok;
+        }
+        return NULL;
+}
+
 void expect(char *op)
 {
         if (token->kind != TK_RESERVED ||
@@ -257,11 +272,27 @@ void program() {
 Node *stmt()
 {
         Node *node;
-        Token *tok = consume_return();
+        Token *tok = consume_reserved();
         if (tok) {
                 node = calloc(1, sizeof(Node));
-                node->kind = ND_RETURN;
-                node->lhs = expr();
+                switch (token->kind) {
+                        case TK_RETURN:
+                                node->kind = ND_RETURN;
+                                node->lhs = expr();
+                                break;
+                        case TK_IF:
+                                node->kind = ND_IF;
+                                break;
+                        case TK_ELSE:
+                                node->kind = ND_ELSE;
+                                break;
+                        case TK_WHILE:
+                                node->kind = ND_WHILE;
+                                break;
+                        case TK_FOR:
+                                node->kind = ND_FOR;
+                                break;
+                }
         } else {
                 node = expr();
         }
