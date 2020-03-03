@@ -65,7 +65,6 @@ typedef enum
         ND_NUM,
         ND_RETURN,
         ND_IF,
-        ND_ELSE,
         ND_WHILE,
         ND_FOR,
 } NodeKind;
@@ -79,6 +78,7 @@ typedef struct Node Node;
  */
 struct Node {
         NodeKind kind; /* ノードの型 */
+        Node *cond;    /* if,while,forの場合のみ */
         Node *lhs;     /* 左辺 */
         Node *rhs;     /* 右辺 */
         int val;       /* kindがND_NUMの場合のみ */
