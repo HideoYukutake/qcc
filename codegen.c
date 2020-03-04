@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "qcc.h"
 
+long unique;
+
 void gen_lval(Node *node) {
         if (node->kind != ND_LVAR) {
                 error("代入の左辺値が変数ではありません");
@@ -37,6 +39,23 @@ void gen(Node *node)
                         printf("    mov rsp, rbp\n");
                         printf("    pop rbp\n");
                         printf("    ret\n");
+                        return;
+                case ND_IF:
+                        gen(node->cond);
+                        printf("    pop rax\n");
+                        printf("    cmp rax, 0\n");
+                        if (node->rhs) {
+                                printf("    je .Lelse%ld\n", unique);
+                                gen(node->lhs);
+                                printf("    jmp .Lend%ld\n", unique);
+                                printf(".Lelse%ld:\n", unique);
+                                gen(node->rhs);
+                        } else {
+                                printf("    je .Lend%ld\n", unique);
+                                gen(node->lhs);
+                        }
+                        printf(".Lend%ld:\n", unique);
+                        unique++;
                         return;
         }
 

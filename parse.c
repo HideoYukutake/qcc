@@ -301,7 +301,7 @@ Node *stmt()
                                 if (tok) {
                                         node->rhs = stmt();
                                 }
-                                break;
+                                return node;
                         case TK_WHILE:
                                 node->kind = ND_WHILE;
                                 break;
