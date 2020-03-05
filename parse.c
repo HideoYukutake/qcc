@@ -304,7 +304,11 @@ Node *stmt()
                                 return node;
                         case TK_WHILE:
                                 node->kind = ND_WHILE;
-                                break;
+                                consume("(");
+                                node->cond = expr();
+                                consume(")");
+                                node->lhs = stmt();
+                                return node;
                         case TK_FOR:
                                 node->kind = ND_FOR;
                                 break;
