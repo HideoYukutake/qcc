@@ -79,6 +79,8 @@ typedef struct Node Node;
 struct Node {
         NodeKind kind; /* ノードの型 */
         Node *cond;    /* if,while,forの場合のみ */
+        Node *init;    /* forの場合のみ */
+        Node *step;    /* forの場合のみ */
         Node *lhs;     /* 左辺 */
         Node *rhs;     /* 右辺 */
         int val;       /* kindがND_NUMの場合のみ */

@@ -133,7 +133,7 @@ Token *tokenize(char *p)
                 }
 
                 if (strncmp(p, "for", 3) == 0 && !is_alnum(p[3])) {
-                        cur = new_token(TK_ELSE, cur, p, 3);
+                        cur = new_token(TK_FOR, cur, p, 3);
                         p += 3;
                         continue;
                 }
@@ -311,7 +311,21 @@ Node *stmt()
                                 return node;
                         case TK_FOR:
                                 node->kind = ND_FOR;
-                                break;
+                                consume("(");
+                                if (!consume(";")) {
+                                        node->init = expr();
+                                        consume(";");
+                                }
+                                if (!consume(";")) {
+                                        node->cond = expr();
+                                        consume(";");
+                                }
+                                if (!consume(")")) {
+                                        node->step = expr();
+                                        consume(")");
+                                }
+                                node->lhs = stmt();
+                                return node;
                 }
         } else {
                 node = expr();

@@ -50,5 +50,8 @@ try 14 "foo = 3; bar = 5 * 6 - 8; return foo + bar / 2;"
 try 4  "i = 3; if ( i == 3 ) i = 4; return i;"
 try 2  "i = 3; if ( i != 3 ) i = 4; else i = 2; return i;"
 try 10 "i = 1; while ( i < 10 ) i = i + 1; return i;"
+try 10 "for ( i = 1;i < 10; i = i + 1 ) i; return i;"
+try 10 "for ( i = 1;i < 10; ) i = i + 1; return i;"
+try 10 "i = 1; for ( ;i < 10; i = i + 1 ) i; return i;"
 
 echo OK
