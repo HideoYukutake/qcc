@@ -100,6 +100,16 @@ Token *tokenize(char *p)
                         continue;
                 }
 
+                if (*p == '{') {
+                        cur = new_token(TK_BLOCK_START, cur, p++, 1);
+                        continue;
+                }
+
+                if (*p == '}') {
+                        cur = new_token(TK_BLOCK_END, cur, p++, 1);
+                        continue;
+                }
+
                 if (isdigit(*p)) {
                         cur = new_token(TK_NUM, cur, p, 0);
                         char *q = p;
@@ -213,6 +223,28 @@ Token *consume_else()
         return NULL;
 }
 
+Token *consume_block()
+{
+        Token *tok;
+        if (token->kind == TK_BLOCK_START) {
+                tok = token;
+                token = token->next;
+                return tok;
+        }
+        return NULL;
+}
+
+Token *consume_block_end()
+{
+        Token *tok;
+        if (token->kind == TK_BLOCK_END) {
+                tok = token;
+                token = token->next;
+                return tok;
+        }
+        return NULL;
+}
+
 void expect(char *op)
 {
         if (token->kind != TK_RESERVED ||
@@ -250,6 +282,7 @@ LVar *find_lvar(Token *tok)
  *
  * program    = stmt*
  * stmt       = expr ";"
+ *            | "{" stmt* "}"
  *            | "if" "(" expr ")" stmt ( "else" stmt )?
  *            | "while" "(" expr ")" stmt
  *            | "for" "(" expr? ";" expr? ";" expr? ")" stmt
@@ -325,6 +358,18 @@ Node *stmt()
                                         consume(")");
                                 }
                                 node->lhs = stmt();
+                                return node;
+                        case TK_BLOCK_START:
+                                node->kind = ND_BLOCK;
+                                Compounds *comps = calloc(1, sizeof(Compounds));
+                                node->comp = comps;
+                                comps->stmt = NULL;
+                                while (consume_block_end()) {
+                                        Compounds *block = calloc(1, sizeof(Compounds));
+                                        block->stmt = stmt();
+                                        comps->next = block;
+                                        comps = block;
+                                }
                                 return node;
                 }
         } else {
@@ -479,4 +524,3 @@ Node *new_node_num(int val)
         node->val = val;
         return node;
 }
-

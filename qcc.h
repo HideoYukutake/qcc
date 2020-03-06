@@ -6,7 +6,7 @@
  *  トークンの種類
  */
 typedef enum {
-        TK_RESERVED,  // return, if, else, while, for,
+        TK_RESERVED,
         TK_NUM,
         TK_IDENT,     // 識別子（変数など）
         TK_RETURN,
@@ -15,6 +15,8 @@ typedef enum {
         TK_WHILE,
         TK_FOR,
         TK_EOF,
+        TK_BLOCK_START,
+        TK_BLOCK_END,
 } TokenKind;
 
 typedef struct Token Token;
@@ -67,8 +69,10 @@ typedef enum
         ND_IF,
         ND_WHILE,
         ND_FOR,
+        ND_BLOCK,
 } NodeKind;
 
+typedef struct _Compounds Compounds;
 typedef struct Node Node;
 
 /*! \struct Node
@@ -83,10 +87,20 @@ struct Node {
         Node *step;    /* forの場合のみ */
         Node *lhs;     /* 左辺 */
         Node *rhs;     /* 右辺 */
+        Compounds *comp;    /* Blockの場合のみ */
         int val;       /* kindがND_NUMの場合のみ */
         int offset;    /* kindがND_LVARの場合のみ */
 };
 
+/*! \struct Compounds
+ *  \brief Brief struct description
+ *
+ *  Detailed description
+ */
+struct _Compounds {
+        Compounds *next;  /*!< Description */
+        Node *stmt;
+} /* optional variable list */;
 
 extern Token *token;
 extern char *user_input;
