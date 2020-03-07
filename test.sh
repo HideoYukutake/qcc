@@ -53,5 +53,7 @@ try 10 "i = 1; while ( i < 10 ) i = i + 1; return i;"
 try 10 "for ( i = 1;i < 10; i = i + 1 ) i; return i;"
 try 10 "for ( i = 1;i < 10; ) i = i + 1; return i;"
 try 10 "i = 1; for ( ;i < 10; i = i + 1 ) i; return i;"
+try 4  "i = 3; if ( i == 3 ) { i = 4; } return i;"
+try 5  "i = 3; if ( i == 3 ) { i = 4; i = 5;} return i;"
 
 echo OK

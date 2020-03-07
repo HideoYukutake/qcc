@@ -15,6 +15,7 @@ void gen_lval(Node *node) {
 
 void gen(Node *node)
 {
+        Compounds *c;
         if (!node) {
                 return;
         }
@@ -84,6 +85,13 @@ void gen(Node *node)
                         printf("    jmp .Lbegin%ld\n", unique);
                         printf(".Lend%ld:\n", unique);
                         unique++;
+                        return;
+                case ND_BLOCK:
+                        c  = node->comp;
+                        while (c = c->next) {
+                                gen(c->stmt);
+                                printf("    pop rax\n");
+                        }
                         return;
         }
 

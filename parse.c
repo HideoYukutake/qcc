@@ -204,6 +204,7 @@ Token *consume_reserved()
             token->kind == TK_IF ||
             token->kind == TK_ELSE ||
             token->kind == TK_FOR ||
+            token->kind == TK_BLOCK_START ||
             token->kind == TK_WHILE) {
                 tok = token;
                 token = token->next;
@@ -364,9 +365,10 @@ Node *stmt()
                                 Compounds *comps = calloc(1, sizeof(Compounds));
                                 node->comp = comps;
                                 comps->stmt = NULL;
-                                while (consume_block_end()) {
+                                while (!consume_block_end()) {
                                         Compounds *block = calloc(1, sizeof(Compounds));
                                         block->stmt = stmt();
+                                        block->next = NULL;
                                         comps->next = block;
                                         comps = block;
                                 }
