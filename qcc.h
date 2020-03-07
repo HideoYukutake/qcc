@@ -70,6 +70,7 @@ typedef enum
         ND_WHILE,
         ND_FOR,
         ND_BLOCK,
+        ND_FUNCTION_CALL,
 } NodeKind;
 
 typedef struct _Compounds Compounds;
@@ -81,15 +82,16 @@ typedef struct Node Node;
  *  抽象構文木のノードの型
  */
 struct Node {
-        NodeKind kind; /* ノードの型 */
-        Node *cond;    /* if,while,forの場合のみ */
-        Node *init;    /* forの場合のみ */
-        Node *step;    /* forの場合のみ */
-        Node *lhs;     /* 左辺 */
-        Node *rhs;     /* 右辺 */
+        NodeKind kind;      /* ノードの型 */
+        char *name;         /* 関数呼び出しの場合のみ */
+        Node *cond;         /* if,while,forの場合のみ */
+        Node *init;         /* forの場合のみ */
+        Node *step;         /* forの場合のみ */
+        Node *lhs;          /* 左辺 */
+        Node *rhs;          /* 右辺 */
         Compounds *comp;    /* Blockの場合のみ */
-        int val;       /* kindがND_NUMの場合のみ */
-        int offset;    /* kindがND_LVARの場合のみ */
+        int val;            /* kindがND_NUMの場合のみ */
+        int offset;         /* kindがND_LVARの場合のみ */
 };
 
 /*! \struct Compounds

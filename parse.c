@@ -295,7 +295,9 @@ LVar *find_lvar(Token *tok)
  * add        = mul ("+" mul | "-" mul)*
  * mul        = unary ("*" unary | "/" unary)*
  * unary      = ("+" | "-")? primary
- * primary    = num | ident | "(" expr ")"
+ * primary    = num
+ *            | ident ("(" ")")?
+ *            | "(" expr ")"
  *
  */
 
@@ -470,23 +472,32 @@ Node *primary()
         // ident に対応する処理
         Token *tok = consume_ident();
         if (tok) {
-                Node *node = calloc(1, sizeof(Node));
-                node->kind = ND_LVAR;
-
-                LVar *lvar = find_lvar(tok);
-
-                if (lvar) {
-                        node->offset = lvar->offset;
+                if (consume("(")) {
+                        // 関数呼び出しの場合
+                        Node *node = calloc(1, sizeof(Node));
+                        node->kind = ND_FUNCTION_CALL;
+                        node->name = tok->str;
+                        node->name[tok->len] = '\0';
+                        consume(")");
+                        return node;
                 } else {
-                        lvar = calloc(1, sizeof(LVar));
-                        lvar->next = locals;
-                        lvar->name = tok->str;
-                        lvar->len = tok->len;
-                        lvar->offset = locals->offset + 8;
-                        node->offset = lvar->offset;
-                        locals = lvar;
+                        // ローカル変数の場合
+                        Node *node = calloc(1, sizeof(Node));
+                        node->kind = ND_LVAR;
+                        LVar *lvar = find_lvar(tok);
+                        if (lvar) {
+                                node->offset = lvar->offset;
+                        } else {
+                                lvar = calloc(1, sizeof(LVar));
+                                lvar->next = locals;
+                                lvar->name = tok->str;
+                                lvar->len = tok->len;
+                                lvar->offset = locals->offset + 8;
+                                node->offset = lvar->offset;
+                                locals = lvar;
+                        }
+                        return node;
                 }
-                return node;
         }
 
         // num に対応する処理
