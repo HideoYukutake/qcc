@@ -94,6 +94,15 @@ void gen(Node *node)
                         }
                         return;
                 case ND_FUNCTION_CALL:
+                        /*
+                        printf("    mov rax, [rsp]\n");
+                        printf("    mov rbx, 16\n");
+                        printf("    div rbx\n");
+                        printf("    cmp rdx, 0\n");
+                        printf("    je .LfuncN%s\n", node->name);
+                        printf("    sub rsp, 8\n");
+                        printf(".LfuncN%s:\n", node->name);
+                        */
                         printf("    call %s\n", node->name);
                         return;
         }

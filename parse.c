@@ -296,7 +296,7 @@ LVar *find_lvar(Token *tok)
  * mul        = unary ("*" unary | "/" unary)*
  * unary      = ("+" | "-")? primary
  * primary    = num
- *            | ident ("(" ")")?
+ *            | ident ("(" (primary "," primary)?  ")")?
  *            | "(" expr ")"
  *
  */

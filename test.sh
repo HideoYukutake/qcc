@@ -5,7 +5,11 @@ try(){
     input="$2"
 
     ./qcc "$input" > tmp.s
-    gcc -o tmp tmp.s
+    if [[ "$expected" = 0 ]]; then
+        gcc -o tmp tmp.s foo.o
+    else
+        gcc -o tmp tmp.s
+    fi
     ./tmp
     actual="$?"
 
