@@ -2,6 +2,7 @@
 #include "qcc.h"
 
 long unique;
+long stack_counter;
 
 void gen_lval(Node *node) {
         if (node->kind != ND_LVAR) {
@@ -88,13 +89,17 @@ void gen(Node *node)
                         return;
                 case ND_BLOCK:
                         c  = node->comp;
-                        while (c = c->next) {
+                        while ((c = c->next)) {
                                 gen(c->stmt);
                                 printf("    pop rax\n");
                         }
                         return;
                 case ND_FUNCTION_CALL:
+                        printf("    push 0\n");
                         /*
+                        if ((stack_counter % 2) == 1) {
+                                printf("    sub rsp, 0x18\n");
+                        }
                         printf("    mov rax, [rsp]\n");
                         printf("    mov rbx, 16\n");
                         printf("    div rbx\n");
