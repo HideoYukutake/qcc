@@ -59,7 +59,9 @@ try 10 "for ( i = 1;i < 10; ) i = i + 1; return i;"
 try 10 "i = 1; for ( ;i < 10; i = i + 1 ) i; return i;"
 try 4  "i = 3; if ( i == 3 ) { i = 4; } return i;"
 try 5  "i = 3; if ( i == 3 ) { i = 4; i = 5;} return i;"
-try 0  "foo();"
+try 0  "foo(); return 0;"
 try 0  "i = 3; if ( i == 3 ) { foo(); foo(); } return 0;"
+try 0  "hoge(1); return 0;"
+try 0  "hoge(1); fuga(1, 2); return 0;"
 
 echo OK

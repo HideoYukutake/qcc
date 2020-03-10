@@ -17,6 +17,7 @@ void gen_lval(Node *node) {
 void gen(Node *node)
 {
         Compounds *c;
+        int argc;
         if (!node) {
                 return;
         }
@@ -95,7 +96,6 @@ void gen(Node *node)
                         }
                         return;
                 case ND_FUNCTION_CALL:
-                        printf("    push 0\n");
                         /*
                         if ((stack_counter % 2) == 1) {
                                 printf("    sub rsp, 0x18\n");
@@ -108,6 +108,41 @@ void gen(Node *node)
                         printf("    sub rsp, 8\n");
                         printf(".LfuncN%s:\n", node->name);
                         */
+                        c = node->comp;
+                        argc = 0;
+                        if (c) {
+                                c = c->next;
+                        }
+                        while (c) {
+                                switch (argc) {
+                                        case 0:
+                                                gen(c->stmt);
+                                                printf("    pop rax\n");
+                                                printf("    mov rdi, rax\n");
+                                                break;
+                                        case 1:
+                                                gen(c->stmt);
+                                                printf("    pop rax\n");
+                                                printf("    mov rsi, rax\n");
+                                                break;
+                                        case 2:
+                                                gen(c->stmt);
+                                                printf("    pop rax\n");
+                                                printf("    mov rdx, rax\n");
+                                                break;
+                                        case 3:
+                                                gen(c->stmt);
+                                                printf("    pop rax\n");
+                                                printf("    mov rcx, rax\n");
+                                                break;
+                                        default:
+                                                gen(c->stmt);
+                                                printf("    pop rax\n");
+                                                printf("    push rax\n");
+                                }
+                                argc++;
+                                c = c->next;
+                        }
                         printf("    call %s\n", node->name);
                         return;
         }

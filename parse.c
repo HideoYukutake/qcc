@@ -90,7 +90,7 @@ Token *tokenize(char *p)
                 }
 
                 // Single-letter punctuator
-                if (strchr("+-*/()><", *p)) {
+                if (strchr("+-*/()><,", *p)) {
                         cur = new_token(TK_RESERVED, cur, p++, 1);
                         continue;
                 }
@@ -296,7 +296,7 @@ LVar *find_lvar(Token *tok)
  * mul        = unary ("*" unary | "/" unary)*
  * unary      = ("+" | "-")? primary
  * primary    = num
- *            | ident ("(" (primary "," primary)?  ")")?
+ *            | ident ("(" (primary ("," primary)*)?  ")")?
  *            | "(" expr ")"
  *
  */
@@ -478,8 +478,29 @@ Node *primary()
                         node->kind = ND_FUNCTION_CALL;
                         node->name = tok->str;
                         node->name[tok->len] = '\0';
-                        consume(")");
-                        return node;
+                        if (consume(")")) {
+                                // 引数なしの場合
+                                return node;
+                        } else {
+                                // 引数ありの場合
+                                Compounds *params = calloc(1, sizeof(Compounds));
+                                node->comp = params;
+                                params->stmt = NULL;
+                                Compounds *param = calloc(1, sizeof(Compounds));
+                                param->stmt = expr();
+                                params->next = param;
+                                params = param;
+                                while (!consume(")")) {
+                                        consume(",");
+                                        Compounds *param = calloc(1, sizeof(Compounds));
+                                        param->stmt = expr();
+                                        params->next = param;
+                                        params = param;
+                                }
+                                params->next = NULL;
+                                return node;
+                                ;
+                        }
                 } else {
                         // ローカル変数の場合
                         Node *node = calloc(1, sizeof(Node));

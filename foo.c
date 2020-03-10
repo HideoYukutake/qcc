@@ -3,5 +3,17 @@
 int foo()
 {
         printf("foo is called\n");
-        return 9;
+        return 0;
+}
+
+int hoge(int a)
+{
+        printf("hoge is called: %d\n", a);
+        return 0;
+}
+
+int fuga(int a, int b)
+{
+        printf("fuga is called: %d\n", a+b);
+        return 0;
 }
