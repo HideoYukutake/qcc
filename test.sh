@@ -5,11 +5,7 @@ try(){
     input="$2"
 
     ./qcc ./test/"$input" > tmp.s
-    if [[ "$expected" = 0 ]]; then
-        gcc -o tmp tmp.s foo.o
-    else
-        gcc -o tmp tmp.s
-    fi
+    gcc -o tmp tmp.s foo.o
     ./tmp
     actual="$?"
 
@@ -61,5 +57,6 @@ try 4  "test37"
 try 5  "test38"
 try 0  "test39"
 try 0  "test40"
+try 7  "test41"
 
 echo OK

@@ -515,7 +515,6 @@ Node *primary()
                                 }
                                 params->next = NULL;
                                 return node;
-                                ;
                         }
                 } else {
                         // ローカル変数の場合
