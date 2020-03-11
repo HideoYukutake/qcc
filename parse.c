@@ -11,9 +11,6 @@ LVar *locals;
 // Utility
 void error_at(char *loc, char *fmt, ...)
 {
-        va_list ap;
-        va_start(ap, fmt);
-
         char *line = loc;
         while (user_input < line && line[-1] != '\n') {
                 line--;
@@ -37,7 +34,7 @@ void error_at(char *loc, char *fmt, ...)
         int pos = loc - line + indent;
         fprintf(stderr, "%*s", pos, "");
         fprintf(stderr, "^ %s\n", fmt);
-        vfprintf(stderr, fmt, ap);
+        //vfprintf(stderr, fmt, ap);
         exit(1);
 }
 
