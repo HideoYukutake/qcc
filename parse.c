@@ -297,7 +297,8 @@ LVar *find_lvar(Token *tok)
 // Abstract Syntax Tree
 /* Syntax
  *
- * program    = stmt*
+ * program    = function*
+ * function   = ident "(" (primary ("," primary)*)? ")" "{" stmt* "}"
  * stmt       = expr ";"
  *            | "{" stmt* "}"
  *            | "if" "(" expr ")" stmt ( "else" stmt )?
@@ -318,7 +319,8 @@ LVar *find_lvar(Token *tok)
  */
 
 
-void program() {
+void program()
+{
         int i = 0;
         locals = calloc(1, sizeof(LVar));
         locals->len = 0;
@@ -327,9 +329,14 @@ void program() {
         locals->next = NULL;
 
         while (!at_eof()) {
-                code[i++] = stmt();
+                code[i++] = function();
         }
         code[i] = NULL;
+}
+
+Node *function()
+{
+        return stmt();
 }
 
 Node *stmt()

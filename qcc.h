@@ -111,6 +111,7 @@ extern LVar *locals;
 extern char *filename;
 
 void program();
+Node *function();
 Node *stmt();
 Node *assign();
 Node *expr();
