@@ -17,7 +17,7 @@ void error_at(char *loc, char *fmt, ...)
         }
 
         char *end = loc;
-        while (*end != '\n') {
+        while (*end != '\n' && token->kind != TK_EOF) {
                 end++;
         }
 

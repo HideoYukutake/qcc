@@ -108,6 +108,7 @@ extern Token *token;
 extern char *user_input;
 extern Node *code[100];
 extern LVar *locals;
+extern char *filename;
 
 void program();
 Node *stmt();
