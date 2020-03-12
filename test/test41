@@ -1,1 +1,6 @@
-i = 3; if ( i == 3 ) { hoge(i); fuga(i, 4);} return 7;
+i = 3;
+if ( i == 3 )
+{
+    hoge(i);
+}
+return fuga(i, 4);

@@ -74,7 +74,9 @@ fuga:
 	leaq	.LC2(%rip), %rdi
 	movl	$0, %eax
 	call	printf@PLT
-	movl	$0, %eax
+	movl	-4(%rbp), %edx
+	movl	-8(%rbp), %eax
+	addl	%edx, %eax
 	leave
 	.cfi_def_cfa 7, 8
 	ret

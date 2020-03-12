@@ -5,7 +5,7 @@ try(){
     input="$2"
 
     ./qcc ./test/"$input" > tmp.s
-    gcc -o tmp tmp.s foo.o
+    gcc -o tmp tmp.s foo.s
     ./tmp
     actual="$?"
 

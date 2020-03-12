@@ -15,5 +15,5 @@ int hoge(int a)
 int fuga(int a, int b)
 {
         printf("fuga is called: %d\n", a+b);
-        return 0;
+        return a+b;
 }

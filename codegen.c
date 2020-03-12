@@ -144,6 +144,7 @@ void gen(Node *node)
                                 c = c->next;
                         }
                         printf("    call %s\n", node->name);
+                        printf("    push rax\n");
                         return;
         }
 
