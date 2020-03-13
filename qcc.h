@@ -71,6 +71,7 @@ typedef enum
         ND_FOR,
         ND_BLOCK,
         ND_FUNCTION_CALL,
+        ND_FUNCTION,
 } NodeKind;
 
 typedef struct _Compounds Compounds;
@@ -83,7 +84,8 @@ typedef struct Node Node;
  */
 struct Node {
         NodeKind kind;      /* ノードの型 */
-        char *name;         /* 関数呼び出しの場合のみ */
+        char *name;         /* 関数の場合のみ */
+        int len;            /* name の長さ*/
         Node *cond;         /* if,while,forの場合のみ */
         Node *init;         /* forの場合のみ */
         Node *step;         /* forの場合のみ */

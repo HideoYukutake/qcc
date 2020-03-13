@@ -187,6 +187,16 @@ bool consume(char *op)
             memcmp(token->str, op, token->len)) {
                 return false;
         }
+        if (token->kind != TK_BLOCK_START ||
+            strlen(op) != token->len ||
+            memcmp(token->str, op, token->len)) {
+                return false;
+        }
+        if (token->kind != TK_BLOCK_END ||
+            strlen(op) != token->len ||
+            memcmp(token->str, op, token->len)) {
+                return false;
+        }
         token = token->next;
         return true;
 }
@@ -336,7 +346,49 @@ void program()
 
 Node *function()
 {
-        return stmt();
+        Node *node;
+        Token *tok = consume_ident();
+        if (!tok) {
+                error_at(token->str, "関数でなければなりません");
+        }
+        // 関数定義
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_FUNCTION;
+        // strncpy(node->name, tok->str, (size_t)tok->len);
+        node->name = tok->str;
+        node->len = tok->len;
+        if (!consume("(")) {
+                error_at(token->str, "引数の文法エラーです");
+        }
+        // 引数の処理
+        if (!consume(")")) {
+                Compounds *params = calloc(1, sizeof(Compounds));
+                node->comp = params;
+                params->stmt = NULL;
+                Compounds *param = calloc(1, sizeof(Compounds));
+                param->stmt = expr();
+                params->next = param;
+                params = param;
+                while (!consume(")")) {
+                        consume(",");
+                        Compounds *param = calloc(1, sizeof(Compounds));
+                        param->stmt = expr();
+                        params->next = param;
+                        params = param;
+                }
+                params->next = NULL;
+        }
+
+        if (!consume("{")) {
+                error_at(token->str, "関数の定義がありません");
+        }
+        node->lhs = stmt();
+
+        if (!consume("}")) {
+                error_at(token->str, "}ではありません");
+        }
+
+        return node;
 }
 
 Node *stmt()
