@@ -88,6 +88,54 @@ void gen(Node *node)
                         printf(".Lend%ld:\n", unique);
                         unique++;
                         return;
+                case ND_FUNCTION:
+                        printf("%s:\n", node->name);
+
+                        // Prologue(関数呼び出しの際の定型の命令)
+                        printf("    push rbp\n");
+                        printf("    mov rbp, rsp\n");
+
+                        c = node->comp;
+                        argc = 0;
+                        if (c) {
+                                c = c->next;
+                        }
+                        while (c) {
+                                switch (argc) {
+                                        case 0:
+                                                // TODO
+                                                // rdi にある値をローカル変数として定義する
+                                                printf("    push rdi\n");
+                                                break;
+                                        case 1:
+                                                // TODO
+                                                // rsi にある値をローカル変数として定義する
+                                                printf("    push rsi\n");
+                                                break;
+                                        case 2:
+                                                // TODO
+                                                // rdx にある値をローカル変数として定義する
+                                                printf("    push rdx\n");
+                                                break;
+                                        case 3:
+                                                // TODO
+                                                // rcx にある値をローカル変数として定義する
+                                                printf("    push rcx\n");
+                                                break;
+                                        default:
+                                                printf("    push rax\n");
+                                }
+                                argc++;
+                                c = c->next;
+                        }
+
+                        gen(node->lhs);
+
+                        // Epilogue(関数の末尾に出力する定型の命令)
+                        printf("    mov rsp, rbp\n");
+                        printf("    pop rbp\n");
+                        printf("    ret\n");
+                        return;
                 case ND_BLOCK:
                         c  = node->comp;
                         while ((c = c->next)) {

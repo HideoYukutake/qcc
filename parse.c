@@ -187,16 +187,6 @@ bool consume(char *op)
             memcmp(token->str, op, token->len)) {
                 return false;
         }
-        if (token->kind != TK_BLOCK_START ||
-            strlen(op) != token->len ||
-            memcmp(token->str, op, token->len)) {
-                return false;
-        }
-        if (token->kind != TK_BLOCK_END ||
-            strlen(op) != token->len ||
-            memcmp(token->str, op, token->len)) {
-                return false;
-        }
         token = token->next;
         return true;
 }
@@ -308,13 +298,14 @@ LVar *find_lvar(Token *tok)
 /* Syntax
  *
  * program    = function*
- * function   = ident "(" (primary ("," primary)*)? ")" "{" stmt* "}"
+ * function   = ident "(" (primary ("," primary)*)? ")" block
  * stmt       = expr ";"
- *            | "{" stmt* "}"
+ *            | block
  *            | "if" "(" expr ")" stmt ( "else" stmt )?
  *            | "while" "(" expr ")" stmt
  *            | "for" "(" expr? ";" expr? ";" expr? ")" stmt
  *            | "return" expr ";"
+ * block      = "{" stmt* "}"
  * expr       = assign
  * assign     = equality ("=" assign)?
  * equality   = relational ("==" relational | "!=" relational)*
@@ -354,9 +345,11 @@ Node *function()
         // 関数定義
         node = calloc(1, sizeof(Node));
         node->kind = ND_FUNCTION;
-        // strncpy(node->name, tok->str, (size_t)tok->len);
-        node->name = tok->str;
-        node->len = tok->len;
+        node->name = (char *)calloc(tok->len+1, sizeof(char));
+        strncpy(node->name, tok->str, (size_t)tok->len);
+        node->name[tok->len] = '\0';
+        // node->name = tok->str;
+        // node->len = tok->len;
         if (!consume("(")) {
                 error_at(token->str, "引数の文法エラーです");
         }
@@ -379,15 +372,12 @@ Node *function()
                 params->next = NULL;
         }
 
-        if (!consume("{")) {
-                error_at(token->str, "関数の定義がありません");
+        tok = consume_reserved();
+        if (tok->kind == TK_BLOCK_START) {
+                node->lhs = block();
+        } else {
+                error_at(tok->str, "'{'ではないトークンです。");
         }
-        node->lhs = stmt();
-
-        if (!consume("}")) {
-                error_at(token->str, "}ではありません");
-        }
-
         return node;
 }
 
@@ -438,17 +428,7 @@ Node *stmt()
                                 node->lhs = stmt();
                                 return node;
                         case TK_BLOCK_START:
-                                node->kind = ND_BLOCK;
-                                Compounds *comps = calloc(1, sizeof(Compounds));
-                                node->comp = comps;
-                                comps->stmt = NULL;
-                                while (!consume_block_end()) {
-                                        Compounds *block = calloc(1, sizeof(Compounds));
-                                        block->stmt = stmt();
-                                        block->next = NULL;
-                                        comps->next = block;
-                                        comps = block;
-                                }
+                                node = block();
                                 return node;
                 }
         } else {
@@ -457,6 +437,24 @@ Node *stmt()
 
         if (!consume(";")) {
                 error_at(token->str, "';'ではないトークンです。");
+        }
+        return node;
+}
+
+Node *block()
+{
+        Node *node;
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_BLOCK;
+        Compounds *comps = calloc(1, sizeof(Compounds));
+        node->comp = comps;
+        comps->stmt = NULL;
+        while (!consume_block_end()) {
+                Compounds *compound = calloc(1, sizeof(Compounds));
+                compound->stmt = stmt();
+                compound->next = NULL;
+                comps->next = compound;
+                comps = compound;
         }
         return node;
 }

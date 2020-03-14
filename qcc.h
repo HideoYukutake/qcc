@@ -115,6 +115,7 @@ extern char *filename;
 void program();
 Node *function();
 Node *stmt();
+Node *block();
 Node *assign();
 Node *expr();
 Node *mul();
