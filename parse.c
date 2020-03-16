@@ -6,7 +6,6 @@
 #include "qcc.h"
 
 char *filename;
-LVar *locals;
 
 // Utility
 void error_at(char *loc, char *fmt, ...)
@@ -282,7 +281,7 @@ int expect_number()
         return val;
 }
 
-LVar *find_lvar(Token *tok)
+LVar *find_lvar(LVar *locals, Token *tok)
 {
         LVar *var;
         for (var = locals; var; var = var->next) {
@@ -323,11 +322,6 @@ LVar *find_lvar(Token *tok)
 void program()
 {
         int i = 0;
-        locals = calloc(1, sizeof(LVar));
-        locals->len = 0;
-        locals->name = "";
-        locals->offset = 0;
-        locals->next = NULL;
 
         while (!at_eof()) {
                 code[i++] = function();
@@ -338,18 +332,28 @@ void program()
 Node *function()
 {
         Node *node;
+        LVar *locals;
+
         Token *tok = consume_ident();
         if (!tok) {
                 error_at(token->str, "関数でなければなりません");
         }
-        // 関数定義
+        // 関数名の設定
         node = calloc(1, sizeof(Node));
         node->kind = ND_FUNCTION;
         node->name = (char *)calloc(tok->len+1, sizeof(char));
         strncpy(node->name, tok->str, (size_t)tok->len);
         node->name[tok->len] = '\0';
-        // node->name = tok->str;
-        // node->len = tok->len;
+
+        // ローカル変数格納リストの用意
+        locals = calloc(1, sizeof(LVar));
+        locals->len = 0;
+        locals->name = "";
+        locals->offset = 0;
+        locals->next = NULL;
+        locals->tail = locals;
+        node->locals = locals;
+
         if (!consume("(")) {
                 error_at(token->str, "引数の文法エラーです");
         }
@@ -359,13 +363,13 @@ Node *function()
                 node->comp = params;
                 params->stmt = NULL;
                 Compounds *param = calloc(1, sizeof(Compounds));
-                param->stmt = expr();
+                param->stmt = expr(locals);
                 params->next = param;
                 params = param;
                 while (!consume(")")) {
                         consume(",");
                         Compounds *param = calloc(1, sizeof(Compounds));
-                        param->stmt = expr();
+                        param->stmt = expr(locals);
                         params->next = param;
                         params = param;
                 }
@@ -374,14 +378,14 @@ Node *function()
 
         tok = consume_reserved();
         if (tok->kind == TK_BLOCK_START) {
-                node->lhs = block();
+                node->lhs = block(locals);
         } else {
                 error_at(tok->str, "'{'ではないトークンです。");
         }
         return node;
 }
 
-Node *stmt()
+Node *stmt(LVar *locals)
 {
         Node *node;
         Token *tok = consume_reserved();
@@ -390,49 +394,49 @@ Node *stmt()
                 switch (tok->kind) {
                         case TK_RETURN:
                                 node->kind = ND_RETURN;
-                                node->lhs = expr();
+                                node->lhs = expr(locals);
                                 break;
                         case TK_IF:
                                 node->kind = ND_IF;
                                 consume("(");
-                                node->cond = expr();
+                                node->cond = expr(locals);
                                 consume(")");
-                                node->lhs = stmt();
+                                node->lhs = stmt(locals);
                                 tok = consume_else();
                                 if (tok) {
-                                        node->rhs = stmt();
+                                        node->rhs = stmt(locals);
                                 }
                                 return node;
                         case TK_WHILE:
                                 node->kind = ND_WHILE;
                                 consume("(");
-                                node->cond = expr();
+                                node->cond = expr(locals);
                                 consume(")");
-                                node->lhs = stmt();
+                                node->lhs = stmt(locals);
                                 return node;
                         case TK_FOR:
                                 node->kind = ND_FOR;
                                 consume("(");
                                 if (!consume(";")) {
-                                        node->init = expr();
+                                        node->init = expr(locals);
                                         consume(";");
                                 }
                                 if (!consume(";")) {
-                                        node->cond = expr();
+                                        node->cond = expr(locals);
                                         consume(";");
                                 }
                                 if (!consume(")")) {
-                                        node->step = expr();
+                                        node->step = expr(locals);
                                         consume(")");
                                 }
-                                node->lhs = stmt();
+                                node->lhs = stmt(locals);
                                 return node;
                         case TK_BLOCK_START:
-                                node = block();
+                                node = block(locals);
                                 return node;
                 }
         } else {
-                node = expr();
+                node = expr(locals);
         }
 
         if (!consume(";")) {
@@ -441,7 +445,7 @@ Node *stmt()
         return node;
 }
 
-Node *block()
+Node *block(LVar *locals)
 {
         Node *node;
         node = calloc(1, sizeof(Node));
@@ -451,7 +455,7 @@ Node *block()
         comps->stmt = NULL;
         while (!consume_block_end()) {
                 Compounds *compound = calloc(1, sizeof(Compounds));
-                compound->stmt = stmt();
+                compound->stmt = stmt(locals);
                 compound->next = NULL;
                 comps->next = compound;
                 comps = compound;
@@ -459,85 +463,85 @@ Node *block()
         return node;
 }
 
-Node *expr()
+Node *expr(LVar *locals)
 {
-        return assign();
+        return assign(locals);
 }
 
-Node *assign()
+Node *assign(LVar *locals)
 {
-        Node *node = equality();
+        Node *node = equality(locals);
         if (consume("=")) {
-                node = new_binary(ND_ASSIGN, node, assign());
+                node = new_binary(ND_ASSIGN, node, assign(locals));
         }
         return node;
 }
 
-Node *equality()
+Node *equality(LVar *locals)
 {
-        Node *node = relational();
+        Node *node = relational(locals);
 
         for (;;) {
                 if (consume("==")) {
-                        node = new_binary(ND_EQ, node, relational());
+                        node = new_binary(ND_EQ, node, relational(locals));
                 } else if (consume("!=")) {
-                        node = new_binary(ND_NE, node, relational());
+                        node = new_binary(ND_NE, node, relational(locals));
                 } else {
                         return node;
                 }
         }
 }
 
-Node *relational()
+Node *relational(LVar *locals)
 {
-        Node *node = add();
+        Node *node = add(locals);
 
         for (;;) {
                 if (consume("<")) {
-                        node = new_binary(ND_LT, node, add());
+                        node = new_binary(ND_LT, node, add(locals));
                 } else if (consume("<=")) {
-                        node = new_binary(ND_LE, node, add());
+                        node = new_binary(ND_LE, node, add(locals));
                 } else if (consume(">")) {
-                        node = new_binary(ND_LT, add(), node);
+                        node = new_binary(ND_LT, add(locals), node);
                 } else if (consume(">=")) {
-                        node = new_binary(ND_LE, add(), node);
+                        node = new_binary(ND_LE, add(locals), node);
                 } else {
                         return node;
                 }
         }
 }
 
-Node *add()
+Node *add(LVar *locals)
 {
-        Node *node = mul();
+        Node *node = mul(locals);
 
         for (;;) {
                 if (consume("+")) {
-                        node = new_binary(ND_ADD, node, mul());
+                        node = new_binary(ND_ADD, node, mul(locals));
                 } else if (consume("-")) {
-                        node = new_binary(ND_SUB, node, mul());
+                        node = new_binary(ND_SUB, node, mul(locals));
                 } else {
                         return node;
                 }
         }
 }
 
-Node *unary()
+Node *unary(LVar *locals)
 {
         if (consume("+")) {
-                return primary();
+                return primary(locals);
         }
         if (consume("-")) {
-                return new_binary(ND_SUB, new_node_num(0), primary());
+                return new_binary(ND_SUB, new_node_num(0), primary(locals));
         }
-        return primary();
+        return primary(locals);
 }
 
-Node *primary()
+Node *primary(LVar *locals)
 {
         // ( expr ) に対応する処理
         if (consume("(")) {
-                Node *node = expr();
+                Node *node = expr(locals);
                 expect(")");
                 return node;
         }
@@ -560,13 +564,13 @@ Node *primary()
                                 node->comp = params;
                                 params->stmt = NULL;
                                 Compounds *param = calloc(1, sizeof(Compounds));
-                                param->stmt = expr();
+                                param->stmt = expr(locals);
                                 params->next = param;
                                 params = param;
                                 while (!consume(")")) {
                                         consume(",");
                                         Compounds *param = calloc(1, sizeof(Compounds));
-                                        param->stmt = expr();
+                                        param->stmt = expr(locals);
                                         params->next = param;
                                         params = param;
                                 }
@@ -577,17 +581,18 @@ Node *primary()
                         // ローカル変数の場合
                         Node *node = calloc(1, sizeof(Node));
                         node->kind = ND_LVAR;
-                        LVar *lvar = find_lvar(tok);
+                        LVar *lvar = find_lvar(locals, tok);
                         if (lvar) {
                                 node->offset = lvar->offset;
                         } else {
                                 lvar = calloc(1, sizeof(LVar));
-                                lvar->next = locals;
+                                locals->tail->next = lvar;
+                                locals->tail = lvar;
+                                locals->len++;
                                 lvar->name = tok->str;
                                 lvar->len = tok->len;
                                 lvar->offset = locals->offset + 8;
                                 node->offset = lvar->offset;
-                                locals = lvar;
                         }
                         return node;
                 }
@@ -598,15 +603,15 @@ Node *primary()
 
 }
 
-Node *mul()
+Node *mul(LVar *locals)
 {
-        Node *node = unary();
+        Node *node = unary(locals);
 
         for (;;) {
                 if (consume("*")) {
-                        node = new_binary(ND_MUL, node, unary());
+                        node = new_binary(ND_MUL, node, unary(locals));
                 } else if (consume("/")) {
-                        node = new_binary(ND_DIV, node, unary());
+                        node = new_binary(ND_DIV, node, unary(locals));
                 } else {
                         return node;
                 }

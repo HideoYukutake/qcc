@@ -129,6 +129,11 @@ void gen(Node *node)
                                 c = c->next;
                         }
 
+                        for (LVar *l = node->locals->next; l ; l = l->next) {
+                                printf("    push %s\n", l->name);
+
+                        }
+
                         gen(node->lhs);
 
                         // Epilogue(関数の末尾に出力する定型の命令)

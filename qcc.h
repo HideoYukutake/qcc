@@ -46,6 +46,7 @@ struct _LVar {
         char *name;
         int len;
         int offset;
+        LVar *tail;
 };
 
 /*! \enum NodeKind
@@ -86,6 +87,7 @@ struct Node {
         NodeKind kind;      /* ノードの型 */
         char *name;         /* 関数の場合のみ */
         int len;            /* name の長さ*/
+        LVar *locals;       /* ローカル変数のリスト。関数の場合のみ */
         Node *cond;         /* if,while,forの場合のみ */
         Node *init;         /* forの場合のみ */
         Node *step;         /* forの場合のみ */
@@ -114,16 +116,16 @@ extern char *filename;
 
 void program();
 Node *function();
-Node *stmt();
-Node *block();
-Node *assign();
-Node *expr();
-Node *mul();
-Node *primary();
-Node *unary();
-Node *equality();
-Node *relational();
-Node *add();
+Node *stmt(LVar *locals);
+Node *block(LVar *locals);
+Node *assign(LVar *locals);
+Node *expr(LVar *locals);
+Node *mul(LVar *locals);
+Node *primary(LVar *locals);
+Node *unary(LVar *locals);
+Node *equality(LVar *locals);
+Node *relational(LVar *locals);
+Node *add(LVar *locals);
 Node *new_binary(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_node_num(int val);
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
