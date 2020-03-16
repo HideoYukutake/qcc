@@ -285,8 +285,7 @@ LVar *find_lvar(LVar *locals, Token *tok)
 {
         LVar *var;
         for (var = locals; var; var = var->next) {
-                if (var->len == tok->len &&
-                    !memcmp(tok->str, var->name, var->len)) {
+                if (!memcmp(tok->str, var->name, var->len)) {
                         return var;
                 }
         }
@@ -588,10 +587,12 @@ Node *primary(LVar *locals)
                                 lvar = calloc(1, sizeof(LVar));
                                 locals->tail->next = lvar;
                                 locals->tail = lvar;
+                                lvar->next = NULL;
                                 locals->len++;
-                                lvar->name = tok->str;
-                                lvar->len = tok->len;
-                                lvar->offset = locals->offset + 8;
+                                lvar->name = calloc(tok->len+1, sizeof(char));
+                                strncpy(lvar->name, tok->str, tok->len);
+                                lvar->name[tok->len] = '\0';
+                                lvar->offset = locals->len * 8;
                                 node->offset = lvar->offset;
                         }
                         return node;
