@@ -1,7 +1,10 @@
-i = 3;
-if ( i == 3 )
+main()
 {
-    hoge(i);
-    fuga(i, 4);
+    i = 3;
+    if ( i == 3 )
+    {
+        hoge(i);
+        fuga(i, 4);
+    }
+    return fuga(i, 4);
 }
-return fuga(i, 4);

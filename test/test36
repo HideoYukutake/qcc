@@ -1,1 +1,7 @@
-i = 1; for ( ;i < 10; i = i + 1 ) i; return i;
+main()
+{
+    i = 1;
+    for ( ;i < 10; i = i + 1 ) 
+        i;
+    return i;
+}

@@ -285,7 +285,7 @@ LVar *find_lvar(LVar *locals, Token *tok)
 {
         LVar *var;
         for (var = locals; var; var = var->next) {
-                if (!memcmp(tok->str, var->name, var->len)) {
+                if (!memcmp(tok->str, var->name, tok->len)) {
                         return var;
                 }
         }
@@ -346,11 +346,9 @@ Node *function()
 
         // ローカル変数格納リストの用意
         locals = calloc(1, sizeof(LVar));
-        locals->len = 0;
         locals->name = "";
         locals->offset = 0;
         locals->next = NULL;
-        locals->tail = locals;
         node->locals = locals;
 
         if (!consume("(")) {
@@ -585,15 +583,16 @@ Node *primary(LVar *locals)
                                 node->offset = lvar->offset;
                         } else {
                                 lvar = calloc(1, sizeof(LVar));
-                                locals->tail->next = lvar;
-                                locals->tail = lvar;
-                                lvar->next = NULL;
-                                locals->len++;
                                 lvar->name = calloc(tok->len+1, sizeof(char));
                                 strncpy(lvar->name, tok->str, tok->len);
                                 lvar->name[tok->len] = '\0';
-                                lvar->offset = locals->len * 8;
+                                lvar->offset = 8;
+                                if (locals->next) {
+                                        lvar->offset = locals->next->offset + 8;
+                                }
                                 node->offset = lvar->offset;
+                                lvar->next = locals->next;
+                                locals->next = lvar;
                         }
                         return node;
                 }

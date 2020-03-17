@@ -1,1 +1,8 @@
-i = 3; if ( i == 3 ) { i = 4; } return i;
+main()
+{
+    i = 3;
+    if ( i == 3 ) {
+        i = 4;
+    }
+    return i;
+}

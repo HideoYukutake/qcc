@@ -44,9 +44,7 @@ typedef struct _LVar LVar;
 struct _LVar {
         LVar *next;
         char *name;
-        int len;
         int offset;
-        LVar *tail;
 };
 
 /*! \enum NodeKind

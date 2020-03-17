@@ -129,7 +129,11 @@ void gen(Node *node)
                                 c = c->next;
                         }
 
-                        printf("    sub rsp, %d\n", 8*node->locals->len);
+                        int i = 0;
+                        for (LVar *lvar = node->locals->next; lvar; lvar=lvar->next) {
+                                i++;
+                        }
+                        printf("    sub rsp, %d\n", 8*i);
 
                         gen(node->lhs);
 
