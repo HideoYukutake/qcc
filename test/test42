@@ -1,0 +1,10 @@
+main()
+{
+    i = 3;
+    return increment(i);
+}
+
+increment(argv)
+{
+    return argv + 1;
+}

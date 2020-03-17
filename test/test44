@@ -1,0 +1,11 @@
+main()
+{
+    return factorial(5);
+}
+
+factorial(i)
+{
+    if (i == 1)
+        return 1;
+    return i * factorial(i-1);
+}
