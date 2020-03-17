@@ -146,7 +146,7 @@ void gen(Node *node)
                         c  = node->comp;
                         while ((c = c->next)) {
                                 gen(c->stmt);
-                                printf("    pop rax\n");
+                                // printf("    pop rax\n");
                         }
                         return;
                 case ND_FUNCTION_CALL:
