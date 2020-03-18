@@ -62,5 +62,6 @@ try 4   "test42"
 try 120 "test43"
 try 120 "test44"
 try 5   "test45"
+try 15  "test46"
 
 echo OK

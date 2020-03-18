@@ -103,23 +103,15 @@ void gen(Node *node)
                         while (c) {
                                 switch (argc) {
                                         case 0:
-                                                // TODO
-                                                // rdi にある値をローカル変数として定義する
                                                 printf("    push rdi\n");
                                                 break;
                                         case 1:
-                                                // TODO
-                                                // rsi にある値をローカル変数として定義する
                                                 printf("    push rsi\n");
                                                 break;
                                         case 2:
-                                                // TODO
-                                                // rdx にある値をローカル変数として定義する
                                                 printf("    push rdx\n");
                                                 break;
                                         case 3:
-                                                // TODO
-                                                // rcx にある値をローカル変数として定義する
                                                 printf("    push rcx\n");
                                                 break;
                                         default:
