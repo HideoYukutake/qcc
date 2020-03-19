@@ -71,6 +71,8 @@ typedef enum
         ND_BLOCK,
         ND_FUNCTION_CALL,
         ND_FUNCTION,
+        ND_ADDR,
+        ND_DEREF,
 } NodeKind;
 
 typedef struct _Compounds Compounds;

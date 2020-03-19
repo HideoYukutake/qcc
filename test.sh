@@ -65,6 +65,5 @@ try 5   "test45"
 try 15  "test46"
 try 3   "test47"
 try 3   "test48"
-try 15  "test46"
 
 echo OK

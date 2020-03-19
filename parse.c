@@ -105,7 +105,7 @@ Token *tokenize(char *p)
                 }
 
                 // Single-letter punctuator
-                if (strchr("+-*/()><,", *p)) {
+                if (strchr("&+-*/()><,", *p)) {
                         cur = new_token(TK_RESERVED, cur, p++, 1);
                         continue;
                 }
@@ -311,6 +311,8 @@ LVar *find_lvar(LVar *locals, Token *tok)
  * add        = mul ("+" mul | "-" mul)*
  * mul        = unary ("*" unary | "/" unary)*
  * unary      = ("+" | "-")? primary
+ *            | "*" unary
+ *            | "&" unary
  * primary    = num
  *            | ident ("(" (primary ("," primary)*)?  ")")?
  *            | "(" expr ")"
@@ -530,6 +532,18 @@ Node *unary(LVar *locals)
         }
         if (consume("-")) {
                 return new_binary(ND_SUB, new_node_num(0), primary(locals));
+        }
+        if (consume("&")) {
+                Node *node = calloc(1, sizeof(Node));
+                node->kind = ND_ADDR;
+                node->lhs = unary(locals);
+                return node;
+        }
+        if (consume("*")) {
+                Node *node = calloc(1, sizeof(Node));
+                node->kind = ND_DEREF;
+                node->lhs = unary(locals);
+                return node;
         }
         return primary(locals);
 }
