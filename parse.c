@@ -295,27 +295,30 @@ LVar *find_lvar(LVar *locals, Token *tok)
 // Abstract Syntax Tree
 /* Syntax
  *
- * program    = function*
- * function   = ident "(" (primary ("," primary)*)? ")" block
- * stmt       = expr ";"
- *            | block
- *            | "if" "(" expr ")" stmt ( "else" stmt )?
- *            | "while" "(" expr ")" stmt
- *            | "for" "(" expr? ";" expr? ";" expr? ")" stmt
- *            | "return" expr ";"
- * block      = "{" stmt* "}"
- * expr       = assign
- * assign     = equality ("=" assign)?
- * equality   = relational ("==" relational | "!=" relational)*
- * relational = add ("<" add | "<=" add | ">" add | ">=" add)*
- * add        = mul ("+" mul | "-" mul)*
- * mul        = unary ("*" unary | "/" unary)*
- * unary      = ("+" | "-")? primary
- *            | "*" unary
- *            | "&" unary
- * primary    = num
- *            | ident ("(" (primary ("," primary)*)?  ")")?
- *            | "(" expr ")"
+ * program              = function*
+ * type                 = "int"
+ * variable_declaration = type "*"? identifier ";"
+ * function_declaration = ident "(" (primary ("," primary)*)? ")" ";"
+ * function             = ident "(" (primary ("," primary)*)? ")" block
+ * stmt                 = expr ";"
+ *                      | block
+ *                      | "if" "(" expr ")" stmt ( "else" stmt )?
+ *                      | "while" "(" expr ")" stmt
+ *                      | "for" "(" expr? ";" expr? ";" expr? ")" stmt
+ *                      | "return" expr ";"
+ * block                = "{" variable_declaration* stmt* "}"
+ * expr                 = assign
+ * assign               = equality ("=" assign)?
+ * equality             = relational ("==" relational | "!=" relational)*
+ * relational           = add ("<" add | "<=" add | ">" add | ">=" add)*
+ * add                  = mul ("+" mul | "-" mul)*
+ * mul                  = unary ("*" unary | "/" unary)*
+ * unary                = ("+" | "-")? primary
+ *                      | "*" unary
+ *                      | "&" unary
+ * primary              = num
+ *                      | ident ("(" (primary ("," primary)*)?  ")")?
+ *                      | "(" expr ")"
  *
  */
 
