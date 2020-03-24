@@ -163,6 +163,12 @@ Token *tokenize(char *p)
                         continue;
                 }
 
+                if (strncmp(p, "int", 3) == 0 && !is_alnum(p[3])) {
+                        cur = new_token(TK_TYPE, cur, p, 3);
+                        p += 3;
+                        continue;
+                }
+
                 if (is_alphabet(*p)) {
                         char *q = p;
                         while (is_alnum(*p)) {
@@ -295,11 +301,13 @@ LVar *find_lvar(LVar *locals, Token *tok)
 // Abstract Syntax Tree
 /* Syntax
  *
- * program              = function*
+ * program              = variable_declaration*
+ *                      | function_declaration*
+ *                      | function_definition*
  * type                 = "int"
  * variable_declaration = type "*"? identifier ";"
  * function_declaration = ident "(" (primary ("," primary)*)? ")" ";"
- * function             = ident "(" (primary ("," primary)*)? ")" block
+ * function_definition  = ident "(" (primary ("," primary)*)? ")" block
  * stmt                 = expr ";"
  *                      | block
  *                      | "if" "(" expr ")" stmt ( "else" stmt )?

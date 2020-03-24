@@ -9,6 +9,7 @@ typedef enum {
         TK_RESERVED,
         TK_NUM,
         TK_IDENT,     // 識別子（変数など）
+        TK_TYPE,
         TK_RETURN,
         TK_IF,
         TK_ELSE,
