@@ -6,22 +6,21 @@
  *  トークンの種類
  */
 typedef enum {
-        TK_RESERVED,
-        TK_NUM,
-        TK_IDENT,     // 識別子（変数など）
-        TK_TYPE,
-        TK_RETURN,
-        TK_IF,
-        TK_ELSE,
-        TK_WHILE,
-        TK_FOR,
-        TK_EOF,
-        TK_BLOCK_START,
-        TK_BLOCK_END,
+  TK_RESERVED, // 記号
+  TK_NUM,      // 整数トークン
+  TK_IDENT,    // 識別子（変数など）
+  TK_TYPE,
+  TK_RETURN,
+  TK_IF,
+  TK_ELSE,
+  TK_WHILE,
+  TK_FOR,
+  TK_EOF,
+  TK_BLOCK_START,
+  TK_BLOCK_END,
 } TokenKind;
 
 typedef struct Token Token;
-
 
 /*! \struct Token
  *  \brief Brief struct description
@@ -29,11 +28,11 @@ typedef struct Token Token;
  *  Detailed description
  */
 struct Token {
-        TokenKind kind;  // トークンの型
-        Token *next;     // 次の入力トークン
-        int val;         // kindがTK_NUMの場合、その数値
-        char *str;       // トークン文字列
-        int len;         // トークンの長さ
+  TokenKind kind; // トークンの型
+  Token *next;    // 次の入力トークン
+  int val;        // kindがTK_NUMの場合、その数値
+  char *str;      // トークン文字列
+  int len;        // トークンの長さ
 };
 
 /*! \struct qcc_t
@@ -43,37 +42,36 @@ struct Token {
  */
 typedef struct _LVar LVar;
 struct _LVar {
-        LVar *next;
-        char *name;
-        int offset;
+  LVar *next;
+  char *name;
+  int offset;
 };
 
 /*! \enum NodeKind
  *
  *  抽象構文木のノードの種類
  */
-typedef enum
-{
-        ND_ADD,
-        ND_SUB,
-        ND_MUL,
-        ND_DIV,
-        ND_EQ,
-        ND_NE,
-        ND_LT,
-        ND_LE,
-        ND_ASSIGN,
-        ND_LVAR,
-        ND_NUM,
-        ND_RETURN,
-        ND_IF,
-        ND_WHILE,
-        ND_FOR,
-        ND_BLOCK,
-        ND_FUNCTION_CALL,
-        ND_FUNCTION,
-        ND_ADDR,
-        ND_DEREF,
+typedef enum {
+  ND_ADD,
+  ND_SUB,
+  ND_MUL,
+  ND_DIV,
+  ND_EQ,
+  ND_NE,
+  ND_LT,
+  ND_LE,
+  ND_ASSIGN,
+  ND_LVAR,
+  ND_NUM,
+  ND_RETURN,
+  ND_IF,
+  ND_WHILE,
+  ND_FOR,
+  ND_BLOCK,
+  ND_FUNCTION_CALL,
+  ND_FUNCTION,
+  ND_ADDR,
+  ND_DEREF,
 } NodeKind;
 
 typedef struct _Compounds Compounds;
@@ -85,18 +83,18 @@ typedef struct Node Node;
  *  抽象構文木のノードの型
  */
 struct Node {
-        NodeKind kind;      /* ノードの型 */
-        char *name;         /* 関数の場合のみ */
-        int len;            /* name の長さ*/
-        LVar *locals;       /* ローカル変数のリスト。関数の場合のみ */
-        Node *cond;         /* if,while,forの場合のみ */
-        Node *init;         /* forの場合のみ */
-        Node *step;         /* forの場合のみ */
-        Node *lhs;          /* 左辺 */
-        Node *rhs;          /* 右辺 */
-        Compounds *comp;    /* Blockの場合のみ */
-        int val;            /* kindがND_NUMの場合のみ */
-        int offset;         /* kindがND_LVARの場合のみ */
+  NodeKind kind;   /* ノードの型 */
+  char *name;      /* 関数の場合のみ */
+  int len;         /* name の長さ*/
+  LVar *locals;    /* ローカル変数のリスト。関数の場合のみ */
+  Node *cond;      /* if,while,forの場合のみ */
+  Node *init;      /* forの場合のみ */
+  Node *step;      /* forの場合のみ */
+  Node *lhs;       /* 左辺 */
+  Node *rhs;       /* 右辺 */
+  Compounds *comp; /* Blockの場合のみ */
+  int val;         /* kindがND_NUMの場合のみ */
+  int offset;      /* kindがND_LVARの場合のみ */
 };
 
 /*! \struct Compounds
@@ -105,8 +103,8 @@ struct Node {
  *  Detailed description
  */
 struct _Compounds {
-        Compounds *next;  /*!< Description */
-        Node *stmt;
+  Compounds *next; /*!< Description */
+  Node *stmt;
 } /* optional variable list */;
 
 extern Token *token;
