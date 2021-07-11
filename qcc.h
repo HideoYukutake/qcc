@@ -5,9 +5,9 @@ extern char *filename;
 // tokenizer
 /* トークンの種類 */
 typedef enum {
-  TK_RESERVED, // 記号
-  TK_NUM,      // 整数トークン
-  TK_IDENT,    // 識別子（変数など）
+  TK_RESERVED,   // 記号
+  TK_NUM,        // 整数トークン
+  TK_IDENTIFIER, // 識別子（変数など）
   TK_TYPE,
   TK_RETURN,
   TK_IF,
@@ -50,7 +50,8 @@ int is_alphabet(char c);
 int is_alnum(char c);
 Token *tokenize(char *p);
 bool consume(char *op);
-Token *consume_ident();
+Token *consume_type();
+Token *consume_identifier();
 Token *consume_return();
 Token *consume_reserved();
 Token *consume_else();

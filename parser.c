@@ -13,8 +13,8 @@
  *                      | function_definition*
  * type                 = "int"
  * variable_declaration = type "*"? identifier ";"
- * function_declaration = ident "(" (primary ("," primary)*)? ")" ";"
- * function_definition  = ident "(" (primary ("," primary)*)? ")" block
+ * function_declaration = type ident "(" (primary ("," primary)*)? ")" ";"
+ * function_definition  = type ident "(" (primary ("," primary)*)? ")" block
  * stmt                 = expr ";"
  *                      | block
  *                      | "if" "(" expr ")" stmt ( "else" stmt )?
@@ -50,7 +50,12 @@ Node *function() {
   Node *node;
   LVar *locals;
 
-  Token *tok = consume_ident();
+  Token *tok = consume_type();
+  if (!tok) {
+    error_at(token->str, "expected int.");
+  }
+
+  tok = consume_identifier();
   if (!tok) {
     error_at(token->str, "関数でなければなりません");
   }
@@ -261,8 +266,8 @@ Node *primary(LVar *locals) {
     return node;
   }
 
-  // ident に対応する処理
-  Token *tok = consume_ident();
+  // identifier に対応する処理
+  Token *tok = consume_identifier();
   if (tok) {
     if (consume("(")) {
       // 関数呼び出しの場合

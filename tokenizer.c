@@ -158,7 +158,7 @@ Token *tokenize(char *p) {
       while (is_alnum(*p)) {
         p++;
       }
-      cur = new_token(TK_IDENT, cur, q, p - q);
+      cur = new_token(TK_IDENTIFIER, cur, q, p - q);
       continue;
     }
 
@@ -178,9 +178,19 @@ bool consume(char *op) {
   return true;
 }
 
-Token *consume_ident() {
+Token *consume_type() {
   Token *tok;
-  if (token->kind == TK_IDENT) {
+  if (token->kind == TK_TYPE) {
+    tok = token;
+    token = token->next;
+    return tok;
+  }
+  return NULL;
+}
+
+Token *consume_identifier() {
+  Token *tok;
+  if (token->kind == TK_IDENTIFIER) {
     tok = token;
     token = token->next;
     return tok;
