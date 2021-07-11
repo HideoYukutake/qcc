@@ -4,7 +4,7 @@
 long unique;
 long stack_counter;
 
-void gen_lval(Node *node) {
+void generate_lval(Node *node) {
   if (node->kind != ND_LVAR) {
     error("代入の左辺値が変数ではありません");
   }
@@ -14,7 +14,7 @@ void gen_lval(Node *node) {
   printf("    push rax\n");
 }
 
-void gen(Node *node) {
+void generate(Node *node) {
   Compounds *c;
   int argc;
   if (!node) {
@@ -26,72 +26,72 @@ void gen(Node *node) {
     printf("    push %d\n", node->val);
     return;
   case ND_LVAR:
-    gen_lval(node);
+    generate_lval(node);
     printf("    pop rax\n");
     printf("    mov rax, [rax]\n");
     printf("    push rax\n");
     return;
   case ND_ADDR:
-    gen_lval(node->lhs);
+    generate_lval(node->lhs);
     return;
   case ND_DEREF:
-    gen(node->lhs);
+    generate(node->lhs);
     printf("    pop rax\n");
     printf("    mov rax, [rax]\n");
     printf("    push rax\n");
     return;
   case ND_ASSIGN:
-    gen_lval(node->lhs);
-    gen(node->rhs);
+    generate_lval(node->lhs);
+    generate(node->rhs);
     printf("    pop rdi\n");
     printf("    pop rax\n");
     printf("    mov [rax], rdi\n");
     printf("    push rdi\n");
     return;
   case ND_RETURN:
-    gen(node->lhs);
+    generate(node->lhs);
     printf("    pop rax\n");
     printf("    mov rsp, rbp\n");
     printf("    pop rbp\n");
     printf("    ret\n");
     return;
   case ND_IF:
-    gen(node->cond);
+    generate(node->cond);
     printf("    pop rax\n");
     printf("    cmp rax, 0\n");
     if (node->rhs) {
       printf("    je .Lelse%ld\n", unique);
-      gen(node->lhs);
+      generate(node->lhs);
       printf("    jmp .Lend%ld\n", unique);
       printf(".Lelse%ld:\n", unique);
-      gen(node->rhs);
+      generate(node->rhs);
     } else {
       printf("    je .Lend%ld\n", unique);
-      gen(node->lhs);
+      generate(node->lhs);
     }
     printf(".Lend%ld:\n", unique);
     unique++;
     return;
   case ND_WHILE:
     printf(".Lbegin%ld:\n", unique);
-    gen(node->cond);
+    generate(node->cond);
     printf("    pop rax\n");
     printf("    cmp rax, 0\n");
     printf("    je .Lend%ld\n", unique);
-    gen(node->lhs);
+    generate(node->lhs);
     printf("    jmp .Lbegin%ld\n", unique);
     printf(".Lend%ld:\n", unique);
     unique++;
     return;
   case ND_FOR:
-    gen(node->init);
+    generate(node->init);
     printf(".Lbegin%ld:\n", unique);
-    gen(node->cond);
+    generate(node->cond);
     printf("    pop rax\n");
     printf("    cmp rax, 0\n");
     printf("    je .Lend%ld\n", unique);
-    gen(node->lhs);
-    gen(node->step);
+    generate(node->lhs);
+    generate(node->step);
     printf("    jmp .Lbegin%ld\n", unique);
     printf(".Lend%ld:\n", unique);
     unique++;
@@ -135,7 +135,7 @@ void gen(Node *node) {
     }
     printf("    sub rsp, %d\n", 8 * i);
 
-    gen(node->lhs);
+    generate(node->lhs);
 
     // Epilogue(関数の末尾に出力する定型の命令)
     printf("    mov rsp, rbp\n");
@@ -145,7 +145,7 @@ void gen(Node *node) {
   case ND_BLOCK:
     c = node->comp;
     while ((c = c->next)) {
-      gen(c->stmt);
+      generate(c->stmt);
       // printf("    pop rax\n");
     }
     return;
@@ -170,27 +170,27 @@ void gen(Node *node) {
     while (c) {
       switch (argc) {
       case 0:
-        gen(c->stmt);
+        generate(c->stmt);
         printf("    pop rax\n");
         printf("    mov rdi, rax\n");
         break;
       case 1:
-        gen(c->stmt);
+        generate(c->stmt);
         printf("    pop rax\n");
         printf("    mov rsi, rax\n");
         break;
       case 2:
-        gen(c->stmt);
+        generate(c->stmt);
         printf("    pop rax\n");
         printf("    mov rdx, rax\n");
         break;
       case 3:
-        gen(c->stmt);
+        generate(c->stmt);
         printf("    pop rax\n");
         printf("    mov rcx, rax\n");
         break;
       default:
-        gen(c->stmt);
+        generate(c->stmt);
         printf("    pop rax\n");
         printf("    push rax\n");
       }
@@ -202,8 +202,8 @@ void gen(Node *node) {
     return;
   }
 
-  gen(node->lhs);
-  gen(node->rhs);
+  generate(node->lhs);
+  generate(node->rhs);
 
   printf("    pop rdi\n");
   printf("    pop rax\n");

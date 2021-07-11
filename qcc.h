@@ -1,10 +1,9 @@
 #include <stdbool.h>
 
-//
-/*! \enum TokenKind
- *
- *  トークンの種類
- */
+extern char *filename;
+
+// tokenizer
+/* トークンの種類 */
 typedef enum {
   TK_RESERVED, // 記号
   TK_NUM,      // 整数トークン
@@ -20,14 +19,8 @@ typedef enum {
   TK_BLOCK_END,
 } TokenKind;
 
-typedef struct Token Token;
-
-/*! \struct Token
- *  \brief Brief struct description
- *
- *  Detailed description
- */
-struct Token {
+typedef struct _Token Token;
+struct _Token {
   TokenKind kind; // トークンの型
   Token *next;    // 次の入力トークン
   int val;        // kindがTK_NUMの場合、その数値
@@ -35,11 +28,7 @@ struct Token {
   int len;        // トークンの長さ
 };
 
-/*! \struct qcc_t
- *  \brief Brief struct description
- *
- *  変数を格納する連結リスト
- */
+/* 変数を格納する連結リスト */
 typedef struct _LVar LVar;
 struct _LVar {
   LVar *next;
@@ -47,6 +36,31 @@ struct _LVar {
   int offset;
 };
 
+extern Token *token;
+extern char *user_input;
+extern LVar *locals;
+
+/* 関数宣言 */
+void error_at(char *loc, char *fmt, ...);
+void error(char *fmt, ...);
+bool at_eof();
+Token *new_token(TokenKind kind, Token *cur, char *str, int len);
+bool startswith(char *p, char *q);
+int is_alphabet(char c);
+int is_alnum(char c);
+Token *tokenize(char *p);
+bool consume(char *op);
+Token *consume_ident();
+Token *consume_return();
+Token *consume_reserved();
+Token *consume_else();
+Token *consume_block();
+Token *consume_block_end();
+void expect(char *op);
+int expect_number();
+LVar *find_lvar(LVar *locals, Token *tok);
+
+// parser
 /*! \enum NodeKind
  *
  *  抽象構文木のノードの種類
@@ -75,14 +89,10 @@ typedef enum {
 } NodeKind;
 
 typedef struct _Compounds Compounds;
-typedef struct Node Node;
+typedef struct _Node Node;
 
-/*! \struct Node
- *  \brief Brief struct description
- *
- *  抽象構文木のノードの型
- */
-struct Node {
+/* 抽象構文木のノードの型 */
+struct _Node {
   NodeKind kind;   /* ノードの型 */
   char *name;      /* 関数の場合のみ */
   int len;         /* name の長さ*/
@@ -97,45 +107,30 @@ struct Node {
   int offset;      /* kindがND_LVARの場合のみ */
 };
 
-/*! \struct Compounds
- *  \brief Brief struct description
- *
- *  Detailed description
- */
+/* Detailed description */
 struct _Compounds {
-  Compounds *next; /*!< Description */
+  Compounds *next;
   Node *stmt;
-} /* optional variable list */;
+};
 
-extern Token *token;
-extern char *user_input;
 extern Node *code[100];
-extern LVar *locals;
-extern char *filename;
 
+/* 関数宣言 */
 void program();
 Node *function();
 Node *stmt(LVar *locals);
 Node *block(LVar *locals);
-Node *assign(LVar *locals);
 Node *expr(LVar *locals);
-Node *mul(LVar *locals);
-Node *primary(LVar *locals);
-Node *unary(LVar *locals);
+Node *assign(LVar *locals);
 Node *equality(LVar *locals);
 Node *relational(LVar *locals);
 Node *add(LVar *locals);
+Node *unary(LVar *locals);
+Node *primary(LVar *locals);
+Node *mul(LVar *locals);
 Node *new_binary(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_node_num(int val);
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
-bool consume(char *op);
-Token *consume_ident();
-void expect(char *op);
-int expect_number();
 
-void gen(Node *node);
-
-Token *tokenize(char *p);
-
-void error_at(char *loc, char *fmt, ...);
-void error(char *fmt, ...);
+// generator
+void generate(Node *node);
