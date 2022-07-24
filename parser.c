@@ -163,6 +163,16 @@ Node *stmt(LVar *locals) {
   return node;
 }
 
+Node *variable_declaration() {
+  Node *node;
+  LVar *locals;
+
+  Token *tok = consume_type();
+  if (!tok) {
+    error_at(token->str, "expected int.");
+  }
+}
+
 Node *block(LVar *locals) {
   Node *node;
   node = calloc(1, sizeof(Node));

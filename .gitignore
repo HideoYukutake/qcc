@@ -6,5 +6,7 @@ tmp*
 *.swp
 *~
 
-# GNU Global
-G*
+# for clangd
+compile_comamnds.json
+compile_flags.txt
+
