@@ -15,7 +15,7 @@ char *filename;
 char *read_file(char *path) {
   FILE *fp = fopen(path, "r");
   if (!fp) {
-    error("cannot open %s: %s", path, strerror(errno));
+    error("ファイルを開けません %s: %s", path, strerror(errno));
   }
 
   if (fseek(fp, 0, SEEK_END) == -1) {
