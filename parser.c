@@ -152,6 +152,8 @@ Node *stmt(LVar *locals) {
     case TK_BLOCK_START:
       node = block(locals);
       return node;
+    case TK_TYPE:
+      fprintf(stderr, "stmt: TK_TYPE start\n");
     }
   } else {
     node = expr(locals);
@@ -171,6 +173,8 @@ Node *variable_declaration() {
   if (!tok) {
     error_at(token->str, "expected int.");
   }
+
+  return node;
 }
 
 Node *block(LVar *locals) {

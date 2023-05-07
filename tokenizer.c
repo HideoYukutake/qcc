@@ -212,7 +212,8 @@ Token *consume_reserved() {
   Token *tok;
   if (token->kind == TK_RETURN || token->kind == TK_IF ||
       token->kind == TK_ELSE || token->kind == TK_FOR ||
-      token->kind == TK_BLOCK_START || token->kind == TK_WHILE) {
+      token->kind == TK_BLOCK_START || token->kind == TK_WHILE ||
+      token->kind == TK_TYPE) {
     tok = token;
     token = token->next;
     return tok;
