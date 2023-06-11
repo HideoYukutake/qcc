@@ -7,6 +7,7 @@ tmp*
 *~
 
 # for clangd
+.cache/*
 .clangd/*
 compile_commands.json
 compile_flags.txt
